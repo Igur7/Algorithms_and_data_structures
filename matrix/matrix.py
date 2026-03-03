@@ -1,8 +1,8 @@
 class matrix:
-    def __init__(self, data):
+    def __init__(self, data,fill = 0):
         if isinstance(data,tuple):
             rows, cols = data
-            self.__matrix = [[0 for _ in range(cols)] for _ in range(rows)]
+            self.__matrix = [[fill for _ in range(cols)] for _ in range(rows)]
         else:
             self.__matrix = data
         self.__rows = len(self.__matrix)
@@ -21,7 +21,7 @@ class matrix:
             raise ValueError("Macierze musza miec takie same rozmiary do dodawania")
 
         rows, cols = self.size()
-        result = matrix((rows, cols))
+        result = matrix((rows, cols),fill = 0 )
 
         for i in range(rows):
             for j in range(cols):
@@ -36,7 +36,7 @@ class matrix:
         if cols_a != rows_b:
             raise ValueError("Liczba kolumn pierwszej macierzy musi byc rowna liczbie wierszy drugiej")
 
-        result = matrix((rows_a, cols_b))
+        result = matrix((rows_a, cols_b),fill = 0)
 
         for i in range(rows_a):
             for j in range(cols_b):
@@ -46,10 +46,29 @@ class matrix:
                 result[i][j] = s
 
         return result
-        
+    
     def __eq__(self, other: 'matrix'):
-        pass
-
+        if self.size() != other.size():
+            return False
+        rows, cols = self.size()
+        for i in range(rows):
+            for j in range(cols):
+                if self[i][j] != other[i][j]:
+                    return False
+        return True 
+    
+    def __str__(self):
+        lines = []
+        for row in self.__matrix:
+            lines.append("|" + "   ".join(str(x) for x in row) + " |")
+        return "\n".join(lines)
+    
 def transpose(m: matrix) -> matrix:
-    pass
+    rows, cols = m.size()
+    result = matrix((cols, rows), 0)
+    for i in range(rows):
+        for j in range(cols):
+            result[j][i] = m[i][j]
+    return result
+
 
