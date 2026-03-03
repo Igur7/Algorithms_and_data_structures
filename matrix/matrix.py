@@ -6,7 +6,7 @@ class matrix:
         else:
             self.__matrix = data
         self.__rows = len(self.__matrix)
-        self.__cols = len(self.__matrix[0]) 
+        self.__cols = len(self.__matrix[0])  
 
     def size(self):
         return (self.__rows, self.__cols)
