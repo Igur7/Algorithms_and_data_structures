@@ -56,6 +56,8 @@ class linked_list:
         return self.head is None
 
     def length(self):
+        if self.head is None:
+            return 0
         count = 0
         current_node = self.head
         while current_node:

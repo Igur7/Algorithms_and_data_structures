@@ -25,6 +25,7 @@ uczelnie.remove()
 
 print("Po usunięciu pierwszego elementu:")
 print(uczelnie.get())
+print(" ")
 
 uczelnie.remove_end()
 
