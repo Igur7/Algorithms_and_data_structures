@@ -60,7 +60,7 @@ class matrix:
     def __str__(self):
         lines = []
         for row in self.__matrix:
-            lines.append("|" + "   ".join(str(x) for x in row) + " |")
+            lines.append("|" + "   ".join(str(x) for x in row) + "|")
         return "\n".join(lines)
     
 def transpose(m: matrix) -> matrix:

@@ -23,6 +23,7 @@ def chio_det(m: matrix):
         reduced = matrix(reduced_data)
 
         return chio_det(reduced) /(a11 ** (rows - 2))
+    
     else:  
         swap_row = -1
         for i in range(1, rows):
