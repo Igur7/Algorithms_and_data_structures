@@ -23,8 +23,23 @@ class linked_list_2directional:
             return
         new_node.next = self.head
 
+        self.head.next = new_node
+        self.head = new_node
+        new_node.prev = None
+        
     def append(self,data):
-        pass
+        new_node = node2(data)
+        if self.head is None:
+            self.head = new_node
+            self.tail = new_node
+            new_node.next = None
+            new_node.prev = None
+            return
+        new_node.prev = self.tail
+        self.tail.next = new_node
+        self.tail = new_node
+        new_node.next = None
+
     
     def remove(self):
         pass
