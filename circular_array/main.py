@@ -1,4 +1,4 @@
-from circular_array import CircularQueue
+from cirrcular_array import CircularQueue
 
 
 def main():
