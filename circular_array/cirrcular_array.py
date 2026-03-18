@@ -62,5 +62,4 @@ class CircularQueue:
         return "[" + ", ".join(str(el) for el in elements) + "]"
 
     def table_state(self):
-        """Zwraca kopię wewnętrznej tablicy dla celów testowych."""
         return list(self.array)
