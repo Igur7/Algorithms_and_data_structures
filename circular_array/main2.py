@@ -138,7 +138,7 @@ class UnrolledLinkedList:
     def print_list(self):
         current = self.head
         while current is not None:
-            print(current.array, end=", ")
+            print(current.array[:current.count], end="->")
             current = current.next
         print("None")
 

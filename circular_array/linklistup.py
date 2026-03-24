@@ -26,10 +26,6 @@ class Node:
         self.count -= 1
         return value
 
-    def __repr__(self) -> str:
-        elements = self.array[:self.count]
-        return f"Node({elements})"
-
 
 class UnrolledLinkedList:
     def __init__(self):
