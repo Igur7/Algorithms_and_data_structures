@@ -102,3 +102,5 @@ class SkipList:
             node = node.tab[0]
 
         return "[" + ", ".join(result) + "]"
+    
+    
