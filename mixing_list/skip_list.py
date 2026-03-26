@@ -3,7 +3,7 @@ import random
 class Node:
     def __init__(self, key, value,level,):
         self.key = key
-        self.value = value
+        self.data = value 
         self.level = level
         self.tab = [None] * level
 
@@ -12,7 +12,7 @@ class SkipList:
         self.max_level = max_level
         self.head = Node(None, None, max_level)
 
-    def randomLevel(p, maxLevel):
+    def randomLevel(self,p, maxLevel):
         lvl = 1   
         while random.random() < p and lvl <maxLevel:
             lvl = lvl + 1
@@ -48,7 +48,7 @@ class SkipList:
             current.data = data
             return
 
-        lvl = self.randomLevel(0.5, self.max_level)
+        lvl = self.randomLevel(0.5,self.max_level)
         new_node = Node(key, data, lvl)
 
         for i in range(lvl):
@@ -102,5 +102,4 @@ class SkipList:
             node = node.tab[0]
 
         return "[" + ", ".join(result) + "]"
-    
     
