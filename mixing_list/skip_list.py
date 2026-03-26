@@ -7,9 +7,6 @@ class Node:
         self.level = level
         self.tab = [None] * level
 
-    def __str__(self):
-        return f"{self.key}:{self.value}"
-
 class SkipList:
     def __init__(self, max_level):
         self.max_level = max_level
@@ -22,14 +19,59 @@ class SkipList:
         return lvl
     
     def search(self, key):
-        while self.head:
-            
+        current = self.head
+
+        for lvl in range(self.max_level - 1,-1,-1):
+            while current.tab[lvl] is not None and current.tab[lvl].key < key:
+                current = current.tab[lvl]
+        
+        #schodze na zero w aktualnym nodzie
+        current = current.tab[0]
+
+        if current is not None and current.key == key:
+            return current.data
+
+        return None            
     
-    def insert(self, key, value):
-        pass
-    
+    def insert(self, key, data):
+        update = [None] * self.max_level
+        current = self.head
+
+        for lvl in range(self.max_level - 1, -1, -1):
+            while current.tab[lvl] is not None and current.tab[lvl].key < key:
+                current = current.tab[lvl]
+            update[lvl] = current
+
+        current = current.tab[0]
+
+        if current is not None and current.key == key:
+            current.data = data
+            return
+
+        lvl = self.randomLevel(0.5, self.max_level)
+        new_node = Node(key, data, lvl)
+
+        for i in range(lvl):
+            new_node.tab[i] = update[i].tab[i]
+            update[i].tab[i] = new_node
+
     def remove(self, key):
-        pass
+        update = [None] * self.max_level
+        current = self.head
+
+        for lvl in range(self.max_level - 1 , -1, -1):
+            while current.tab[lvl] is not None and current.tab[lvl].key < key:
+                current = current.tab[lvl]
+            update[lvl] = current
+        
+        current = current.tab[0]
+
+        if current is not None and current.key == key:
+            for i in range(current.level):
+                if update[i].tab[i] != current:
+                    break
+                update[i].tab[i] = current.tab[i]
+        del current
     
     def displayList_(self):
         node = self.head.tab[0] 
@@ -50,3 +92,13 @@ class SkipList:
                 print(f"{node.key:2d}:{node.data:2s}", end="")
                 node = node.tab[lvl]
             print()
+    
+    def __str__(self):
+        result = []
+        node = self.head.tab[0]  
+
+        while node is not None:
+            result.append(f"({node.key}:{node.data})")
+            node = node.tab[0]
+
+        return "[" + ", ".join(result) + "]"
