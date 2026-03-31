@@ -12,7 +12,7 @@ if __name__ == "__main__":
         sl.insert(i, letter)
 
     print("Lista po wstawieniu 1..15:")
-    print(sl)  
+    sl.displayList_()
 
     print("\nWyszukaj klucz 2:", sl.search(2))
 
@@ -44,7 +44,7 @@ if __name__ == "__main__":
         sl2.insert(i, letter)
 
     print("Lista po wstawieniu 15..1:")
-    print(sl2)
+    sl2.displayList_()
 
     print("\nWyszukaj klucz 2:", sl2.search(2))
 
