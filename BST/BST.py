@@ -1,7 +1,7 @@
 class ChildNode:
     def __init__(self,key,value,right=None,left=None):
         self.key=key
-        self.value=value
+        self.data=value
         self.right=right
         self.left=left
 
@@ -13,7 +13,7 @@ class BST:
         first = self.root
         while first is not None:
             if first.key == key:
-                return first.value
+                return first.data
             elif first.key < key:
                 first = first.right
             else:
@@ -28,7 +28,7 @@ class BST:
         
         while first is not None: 
             if first.key == key:
-                first.value = value
+                first.data = value
                 return
             elif first.key < key:
                 if first.right is None:
@@ -75,7 +75,9 @@ class BST:
             first = None
 
         elif first.right is None and first.left is not None:
-            if previous.right == first:
+            if previous is None:
+                self.root = first.left
+            elif previous.right == first:
                 previous.right = first.left
             elif previous.left == first:
                 previous.left = first.left
@@ -83,7 +85,9 @@ class BST:
             first = None
 
         elif first.left is None and first.right is not None:
-            if previous.right == first:
+            if previous is None:
+                self.root = first.right
+            elif previous.right == first:
                 previous.right = first.right
             elif previous.left == first:
                 previous.left = first.right
@@ -112,12 +116,45 @@ class BST:
             successor.left = first.left
             first = None
 
-    
-    def print_as_list(self):
-        pass
-
     def print_tree(self):
-        pass
+        print("==============")
+        self.__print_tree(self.root, 0)
+        print("==============")
 
+    def __print_tree(self, node, lvl):
+        if node!=None:
+            self.__print_tree(node.right, lvl+5)
+
+            print()
+            print(lvl*" ", node.key, node.data)
+     
+            self.__print_tree(node.left, lvl+5)
+
+    def print_as_list(self):
+        result = []
+        stack = []
+        current = self.root
+
+        while stack or current:
+            while current:
+                stack.append(current)
+                current = current.left
+            
+            current = stack.pop()
+            result.append(f"{current.key} {current.data}")  
+            current = current.right
+
+        return ",".join(result)
+    
     def height(self):
-        pass
+        return self.__height(self.root)
+    
+    def __height(self, node):
+        if node is None:
+            return 0
+        
+        left_height = self.__height(node.left)
+        right_height = self.__height(node.right)
+
+        return max(left_height, right_height) + 1
+        
