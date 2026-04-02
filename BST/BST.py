@@ -45,29 +45,73 @@ class BST:
 
     def delete(self,key):
         first = self.root
+
         if first is None:
-            return None
-        while first is not None:
-            if first.key == key:
-                if first.left is None and first.right is None:
-                    first = None
-                    return
-                elif first.left is not None and first.right is not None:
-                    old = first
-                    first = first.right
-                    while first.left is not None:
-                        first = first.left
-                    old.key = first.key
-                    old.value = first.value
-                elif first.left is not None:
-                    pass
-                elif first.right is not None:
-                    pass
-            if first.key < key:
-                first = first.right
-            else:
+            return
+
+
+        if first.left is None and first.right is None and first.key == key:
+            self.root = None
+            return
+        
+        previous = None
+
+        while first is not None and first.key != key:
+            previous = first
+            if key < first.key:
                 first = first.left
-        return None
+            else:
+                first = first.right
+        
+        if first is None:
+            return 
+        
+        if first.left is None and first.right is None:
+            if previous.left == first:
+                previous.left = None
+            else:
+                previous.right = None
+
+            first = None
+
+        elif first.right is None and first.left is not None:
+            if previous.right == first:
+                previous.right = first.left
+            elif previous.left == first:
+                previous.left = first.left
+
+            first = None
+
+        elif first.left is None and first.right is not None:
+            if previous.right == first:
+                previous.right = first.right
+            elif previous.left == first:
+                previous.left = first.right
+
+            first = None
+        
+        elif first.left is not None and first.right is not None:
+            successor = first.right
+            successor_parent = first
+
+            while successor.left is not None:
+                successor_parent = successor
+                successor = successor.left
+            
+            if successor_parent != first:
+                successor_parent.left = successor.right
+                successor.right = first.right
+            
+            if previous is None:
+                self.root = successor
+            elif previous.left == first:
+                previous.left = successor
+            else:
+                previous.right = successor
+            
+            successor.left = first.left
+            first = None
+
     
     def print_as_list(self):
         pass
