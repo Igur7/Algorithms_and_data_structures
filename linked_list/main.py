@@ -1,4 +1,4 @@
-import list
+import linked_list.listl as listl
 
 unis = [('AGH', 'Kraków', 1919),
 ('UJ', 'Kraków', 1364),
@@ -7,7 +7,7 @@ unis = [('AGH', 'Kraków', 1919),
 ('UP', 'Poznań', 1919),
 ('PG', 'Gdańsk', 1945)]
 
-uczelnie = list.linked_list()
+uczelnie = listl.linked_list()
 
 uczelnie.append(unis[0])
 uczelnie.append(unis[1])
