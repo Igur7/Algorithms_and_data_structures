@@ -3,10 +3,12 @@ class matrix:
         if isinstance(data,tuple):
             rows, cols = data
             self.__matrix = [[fill for _ in range(cols)] for _ in range(rows)]
+            self.__rows = rows
+            self.__cols = cols
         else:
             self.__matrix = data
-        self.__rows = len(self.__matrix)
-        self.__cols = len(self.__matrix[0])  
+            self.__rows = len(self.__matrix)
+            self.__cols = len(self.__matrix[0]) if self.__rows > 0 else 0
 
     def size(self):
         return (self.__rows, self.__cols)
@@ -70,5 +72,4 @@ def transpose(m: matrix) -> matrix:
         for j in range(cols):
             result[j][i] = m[i][j]
     return result
-
 
