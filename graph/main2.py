@@ -309,31 +309,84 @@ class ListGraph(Graph):
         else:
             return vertex_id
 
+def color_graph(graph, method):
 
-def test_graph(graph_class):
+    start = graph.vertices()[0]
 
-    graph = graph_class()
-    vertices = {}
-
-    for vertex1, vertex2 in graf:
-        if vertex1 not in vertices:
-            vertices[vertex1] = Vertex(vertex1)
-            graph.insert_vertex(vertices[vertex1])
-
-        if vertex2 not in vertices:
-            vertices[vertex2] = Vertex(vertex2)
-            graph.insert_vertex(vertices[vertex2])
-
-        graph.insert_edge(vertices[vertex1], vertices[vertex2], 1)
-
-    graph.delete_vertex(vertices["K"])
-    graph.delete_edge(vertices["W"], vertices["E"])
-
-    draw_map(graph)
-
-def test_both_graphs():
-    test_graph(ListGraph)
-    test_graph(MatrixGraph)
+    if method == "DFS":
+        stack = [start]
+    elif method == "BFS":
+        queue = [start]
+    else:
+        return None
     
+    colors = {}
+
+    visited = set()
+
+    def color(vertex):
+        neighbour_colors = set()
+        for neighbour, _ in graph.neighbours(vertex):
+            if neighbour in colors:
+                neighbour_colors.add(colors[neighbour])
+        color = 1
+        while color in neighbour_colors:
+            color += 1
+        colors[vertex] = color
+
+    if method == "DFS":
+        while stack:
+            vertex = stack.pop()
+            if vertex not in visited:
+                color(vertex)
+                visited.add(vertex)
+                for neighbour, _ in graph.neighbours(vertex):
+                    if neighbour not in visited:
+                        stack.append(neighbour)
+    elif method == "BFS":
+        while queue:
+            vertex = queue.pop(0)
+            if vertex in visited:
+                continue
+            visited.add(vertex)
+            color(vertex)
+            for neighbour, _ in graph.neighbours(vertex):
+                if neighbour not in visited:
+                    queue.append(neighbour)
+
+    return [(str(v), colors[v]) for v in colors]
+
+def test():
+
+    graph_matrix = MatrixGraph()
+    vertices = {}
+    for v1, v2 in graf:
+        if v1 not in vertices:
+            vertices[v1] = Vertex(v1)
+            graph_matrix.insert_vertex(vertices[v1])
+        if v2 not in vertices:
+            vertices[v2] = Vertex(v2)
+            graph_matrix.insert_vertex(vertices[v2])
+        graph_matrix.insert_edge(vertices[v1], vertices[v2], 1)
+
+    result_dfs = color_graph(graph_matrix, "DFS")
+    print("DFS max kolor:", max(c for w, c in result_dfs))
+    draw_map(graph_matrix, result_dfs)
+
+    graph_list = ListGraph()
+    vertices = {}
+    for v1, v2 in graf:
+        if v1 not in vertices:
+            vertices[v1] = Vertex(v1)
+            graph_list.insert_vertex(vertices[v1])
+        if v2 not in vertices:
+            vertices[v2] = Vertex(v2)
+            graph_list.insert_vertex(vertices[v2])
+        graph_list.insert_edge(vertices[v1], vertices[v2])
+
+    result_bfs = color_graph(graph_list, "BFS")
+    print("BFS max kolor:", max(c for w, c in result_bfs))
+    draw_map(graph_list, result_bfs)
+
 if __name__ == "__main__":
-    test_both_graphs()
+    test()
