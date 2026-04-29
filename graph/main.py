@@ -165,7 +165,7 @@ class MatrixGraph(Graph):
             self.matrix[idv1][idv2] = edge
             self.matrix[idv2][idv1] = edge
     
-    def delete_edqge(self, vertex1, vertex2):
+    def delete_edge(self, vertex1, vertex2):
         idv1 = self._get_vertex_index(vertex1)
         idv2 = self._get_vertex_index(vertex2)
 
@@ -211,5 +211,127 @@ class MatrixGraph(Graph):
         else:
             return edge
 
+    def vertices(self):
+        return self.vertices_list[:]
+
+    def neighbours(self, vertex_id):
+        idv = self._get_vertex_index(vertex_id)
+
+        if idv is None:
+            return []
+        
+        neighbours_list = []
+
+        for i, edge in enumerate(self.matrix[idv]):
+            if edge != self.init_value:
+                neighbours_list.append((self.vertices_list[i], edge))
+
+        return neighbours_list
+
+    def get_vertex(self, vertex_id):
+        idv = self._get_vertex_index(vertex_id)
+
+        if idv is None:
+            return None
+
+        return self.vertices_list[idv]
+        
 class ListGraph(Graph):
-    pass
+    def __init__(self):
+        self.graph = {}
+
+    def is_empty(self):
+        if len(self.graph) == 0:
+            return True
+        else:
+            return False
+    
+    def insert_vertex(self, vertex):
+        if vertex not in self.graph:
+            self.graph[vertex] = {}
+        else:
+            return
+    
+    def insert_edge(self, vertex1, vertex2, edge):
+        if vertex1 not in self.graph or vertex2 not in self.graph:
+            return 
+        else:
+            self.graph[vertex1][vertex2] = edge
+            self.graph[vertex2][vertex1] = edge
+    
+    def delete_edge(self, vertex1, vertex2):
+        if vertex1 not in self.graph or vertex2 not in self.graph:
+            return 
+        else:
+            if vertex2 in self.graph[vertex1]:
+                del self.graph[vertex1][vertex2]
+            if vertex1 in self.graph[vertex2]:
+                del self.graph[vertex2][vertex1]
+    
+    def delete_vertex(self, vertex):
+        if vertex not in self.graph:
+            return 
+        else:
+            del self.graph[vertex]
+
+            for v in self.graph:
+                if vertex in self.graph[v]:
+                    del self.graph[v][vertex]
+            
+    def get_edge(self,vertex1, vertex2):
+        if vertex1 not in self.graph or vertex2 not in self.graph:
+            return None
+        else:
+            if vertex2 in self.graph[vertex1]:
+                return self.graph[vertex1][vertex2]
+            else:
+                return None
+            
+    def vertices(self):
+        if len(self.graph) == 0:
+            return []
+        else:
+            return list(self.graph.keys())
+    
+    def neighbours(self, vertex_id):
+        if vertex_id not in self.graph:
+            return []
+        else:
+            ans = []
+            for neighbor in self.graph[vertex_id]:
+                ans.append((neighbor, self.graph[vertex_id][neighbor]))
+            return ans
+    
+    def get_vertex(self, vertex_id):
+        if vertex_id not in self.graph:
+            return None
+        else:
+            return vertex_id
+
+
+def test_graph(graph_class):
+    from polska import graf, draw_map
+
+    graph = graph_class()
+    vertices = {}
+
+    for vertex1, vertex2 in graf:
+        if vertex1 not in vertices:
+            vertices[vertex1] = Vertex(vertex1)
+            graph.insert_vertex(vertices[vertex1])
+
+        if vertex2 not in vertices:
+            vertices[vertex2] = Vertex(vertex2)
+            graph.insert_vertex(vertices[vertex2])
+
+        graph.insert_edge(vertices[vertex1], vertices[vertex2], 1)
+
+    graph.delete_vertex(vertices["K"])
+    graph.delete_edge(vertices["W"], vertices["E"])
+
+    draw_map(graph)
+
+
+if __name__ == "__main__":
+    test_graph(ListGraph)
+    test_graph(MatrixGraph)
