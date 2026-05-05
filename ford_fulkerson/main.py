@@ -55,11 +55,11 @@ class Graph(ABC):
         pass
 
     @abstractmethod
-    def delete_edge(self, vertex1, vertex2):
+    def delete_edge(self, vertex1, vertex2, residual=None):
         pass
 
     @abstractmethod
-    def get_edge(self, vertex1, vertex2):
+    def get_edge(self, vertex1, vertex2, residual=None):
         pass
 
     @abstractmethod
@@ -88,22 +88,30 @@ class ListGraph(Graph):
     
     def insert_vertex(self, vertex):
         if vertex not in self.graph:
-            self.graph[vertex] = {}
-        else:
-            return
+            self.graph[vertex] = []
     
     def insert_edge(self, vertex1, vertex2, edge = None):
         if vertex1 not in self.graph or vertex2 not in self.graph:
             return 
         else:
-            self.graph[vertex1][vertex2] = edge
+            self.graph[vertex1].append((vertex2, edge))
     
-    def delete_edge(self, vertex1, vertex2):
+    def delete_edge(self, vertex1, vertex2, residual=None):
         if vertex1 not in self.graph or vertex2 not in self.graph:
-            return 
-        else:
-            if vertex2 in self.graph[vertex1]:
-                del self.graph[vertex1][vertex2]
+            return
+
+        new_list = []
+        removed = False
+
+        for neighbor, edge in self.graph[vertex1]:
+            if not removed and neighbor == vertex2:
+                if residual is None or edge.residual == residual:
+                    removed = True
+                    continue
+            new_list.append((neighbor, edge))
+
+        self.graph[vertex1] = new_list
+
     
     def delete_vertex(self, vertex):
         if vertex not in self.graph:
@@ -112,17 +120,23 @@ class ListGraph(Graph):
             del self.graph[vertex]
 
             for v in self.graph:
-                if vertex in self.graph[v]:
-                    del self.graph[v][vertex]
+                self.graph[v] = [
+                    (neighbor, edge)
+                    for neighbor, edge in self.graph[v]
+                    if neighbor != vertex
+                ]
             
-    def get_edge(self,vertex1, vertex2):
+    def get_edge(self, vertex1, vertex2, residual=None):
         if vertex1 not in self.graph or vertex2 not in self.graph:
             return None
-        else:
-            if vertex2 in self.graph[vertex1]:
-                return self.graph[vertex1][vertex2]
-            else:
-                return None
+
+        for neighbor, edge in self.graph[vertex1]:
+            if neighbor == vertex2:
+                if residual is None or edge.residual == residual:
+                    return edge
+
+        return None
+
             
     def vertices(self):
         if len(self.graph) == 0:
@@ -135,10 +149,10 @@ class ListGraph(Graph):
             return []
         else:
             ans = []
-            for neighbor in self.graph[vertex_id]:
-                ans.append((neighbor, self.graph[vertex_id][neighbor]))
+            for neighbor, edge in self.graph[vertex_id]:
+                ans.append((neighbor, edge))
             return ans
-    
+
     def get_vertex(self, vertex_id):
         if vertex_id not in self.graph:
             return None
@@ -163,7 +177,7 @@ def bfs(graph, start, end):
         for neighbor, edge in graph.neighbours(current):
             if neighbor not in visited and edge.residual_capacity > 0:
                 visited.add(neighbor)
-                parent[neighbor] = current
+                parent[neighbor] = (current, edge)
                 queue.append(neighbor)
 
                 if neighbor == end:
@@ -171,20 +185,115 @@ def bfs(graph, start, end):
 
     return parent
 
+def path_capacity(graph, start, end, parent):
+    if end not in parent:
+        return 0
+    
+    current = end
+    min_capacity = float('inf')
+
+    while current != start:
+        prev, edge = parent[current]
+        min_capacity = min(min_capacity, edge.residual_capacity)
+        current = prev
+
+    return min_capacity
+
+def augment_path(graph, start, end, parent, min_capacity):
+    if min_capacity == 0:
+        return
+
+    current = end
+
+    while current != start:
+        prev, edge = parent[current]
+
+        if edge.residual:
+            reverse_edge = graph.get_edge(current, prev, residual=False)
+        else:
+            reverse_edge = graph.get_edge(current, prev, residual=True)
+
+        edge.residual_capacity -= min_capacity
+        reverse_edge.residual_capacity += min_capacity
+
+        if not edge.residual:
+            edge.flow += min_capacity
+        else:
+            reverse_edge.flow -= min_capacity
+
+        current = prev
+
+def ford_fulkerson(graph, start, end):
+    parent = bfs(graph, start, end)
+    min_capacity = path_capacity(graph, start, end, parent)
+
+    while min_capacity > 0:
+        augment_path(graph, start, end, parent, min_capacity)
+        parent = bfs(graph, start, end)
+        min_capacity = path_capacity(graph, start, end, parent)
+
+    max_flow = 0
+
+    for v in graph.vertices():
+        for neighbor, edge in graph.neighbours(v):
+            if neighbor == end and not edge.residual:
+                max_flow += edge.flow
+
+    return max_flow
+
+def build_graph(edges):
+    graph = ListGraph()
+    vertices = {}
+
+    for v1, v2, capacity in edges:
+        if v1 not in vertices:
+            vertices[v1] = Vertex(v1)
+            graph.insert_vertex(vertices[v1])
+
+        if v2 not in vertices:
+            vertices[v2] = Vertex(v2)
+            graph.insert_vertex(vertices[v2])
+
+        add_flow_edge(graph, vertices[v1], vertices[v2], capacity)
+
+    return graph, vertices
+
+
+def real_outflow(graph, vertex):
+    total = 0
+
+    for neighbor, edge in graph.neighbours(vertex):
+        if not edge.residual:
+            total += edge.flow
+
+    return total
+
 
 
 if __name__ == "__main__":
-    g = ListGraph()
+    graf_0 = [('s', 'u', 2), ('u', 't', 1), ('u', 'v', 3), ('s', 'v', 1), ('v', 't', 2)]
 
-    s = Vertex("s")
-    u = Vertex("u")
-    t = Vertex("t")
+    graf_1 = [('s', 'a', 16), ('s', 'c', 13), ('a', 'c', 10), ('a', 'b', 12),
+              ('b', 'c', 9), ('b', 't', 20), ('c', 'd', 14), ('d', 'b', 7), ('d', 't', 4)]
 
-    g.insert_vertex(s)
-    g.insert_vertex(u)
-    g.insert_vertex(t)
+    graf_2 = [('s', 'a', 3), ('s', 'c', 3), ('a', 'b', 4), ('b', 's', 3), ('b', 'c', 1),
+              ('b', 'd', 2), ('c', 'e', 6), ('c', 'd', 2), ('d', 't', 1), ('e', 't', 9)]
 
-    add_flow_edge(g, s, u, 2)
-    add_flow_edge(g, u, t, 1)
+    graf_3 = [('s', 'a', 3), ('s', 'd', 2), ('a', 'b', 4), ('b', 'c', 5), ('c', 't', 6),
+              ('a', 'f', 3), ('f', 't', 3), ('d', 'e', 2), ('e', 'f', 2)]
 
-    printGraph(g)
+    tests = [
+        (graf_0, 'u'),
+        (graf_1, 'a'),
+        (graf_2, 'a'),
+        (graf_3, 'a')
+    ]
+
+    for edges, out_vertex in tests:
+        graph, vertices = build_graph(edges)
+        result = ford_fulkerson(graph, vertices['s'], vertices['t'])
+
+        print(result)
+        printGraph(graph)
+        print(real_outflow(graph, vertices[out_vertex]))
+
