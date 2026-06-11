@@ -269,11 +269,11 @@ def generate_m_matricies(used_columns, current_row,M,variants):
     rows, cols = M.size()
 
     if current_row == rows:
-        variants.append(deepcopy(used_columns))
+        variants.append(deepcopy(M))
         return
 
     for col in range(cols):
-        if col not in used_columns:
+        if not used_columns[col]:
             used_columns[col] = True
 
             for j in range(cols):
@@ -297,7 +297,7 @@ def ullman_algorithm_v1(used_columns, current_row, M, P, G, isomorphisms,calls =
         return calls
     
     for col in range(cols):
-        if col not in used_columns:
+        if not used_columns[col]:
             used_columns[col] = True
 
             for j in range(cols):
